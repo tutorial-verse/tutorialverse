@@ -88,6 +88,7 @@ read_tutorial_metadata <- function(path) {
 #' validate_tutorial_metadata(metadata, existing_ids = "intro-example")
 validate_tutorial_metadata <- function(metadata, existing_ids = character()) {
   if (inherits(metadata, "tutorial_metadata_result")) {
+    # Preserve the original read failure so missing-field errors do not obscure it.
     if (identical(metadata$status, "fail")) {
       return(metadata)
     }
@@ -128,6 +129,7 @@ validate_tutorial_metadata <- function(metadata, existing_ids = character()) {
     }
   }
 
+  # Format checks require scalar text; other values already have type issues.
   id <- metadata[["id"]]
   if (is_metadata_text(id)) {
     if (!grepl("^[a-z0-9]+(-[a-z0-9]+)*$", id)) {
@@ -135,6 +137,7 @@ validate_tutorial_metadata <- function(metadata, existing_ids = character()) {
         "id", "invalid_id", "Use lowercase letters or digits separated by hyphens."
       ))
     }
+    # A single record cannot establish uniqueness without the other record IDs.
     if (is.character(existing_ids) && id %in% existing_ids) {
       issues <- rbind(issues, metadata_issue(
         "id", "duplicate_id", "Another record has the same tutorial ID."
@@ -220,6 +223,7 @@ is_metadata_url <- function(value) {
   }
   host <- parts[[2L]]
   port <- parts[[4L]]
+  # Reject long digit strings before integer conversion can overflow to NA.
   if (nzchar(port) && (nchar(port) > 5L ||
       as.integer(port) < 1L || as.integer(port) > 65535L)) {
     return(FALSE)
