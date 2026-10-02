@@ -1,20 +1,21 @@
 # tutorialverse
 
 tutorialverse provides a shared metadata format for interactive R tutorials
-built with `learnr`, `learnr2`, and Quarto Live. The current prototype reads YAML
-records and reports missing fields, invalid values, and duplicate IDs.
+built with `learnr`, `learnr2`, and Quarto Live. The prototype validates YAML
+records, checks source and lesson URLs, and optionally renders local tutorials.
+Each check reports its own result and limits.
 
 ## Installation
 
 From a local checkout, run these commands in R at the repository root:
 
 ```r
-install.packages("yaml", repos = "https://cloud.r-project.org")
+install.packages(c("yaml", "curl"), repos = "https://cloud.r-project.org")
 install.packages(".", repos = NULL, type = "source")
 ```
 
-The package uses `yaml` to read metadata files. Package checks passed with
-R 4.5.1. A minimum supported R version is not yet declared.
+The package uses `yaml` to read metadata and `curl` to check URLs. Package checks
+passed with R 4.5.1. A minimum supported R version is not yet declared.
 
 ## Example
 
@@ -48,6 +49,55 @@ result$issues
 
 A successful read means that the file was parsed. Validation applies the
 metadata rules. These examples use test records and reserved example URLs.
+
+## Tutorial checks
+
+Use `check_tutorial()` to combine metadata validation and engine checks in one
+report. This example disables URL requests because it uses a test record:
+
+```r
+report <- check_tutorial(metadata, online = FALSE)
+report$metadata$status
+#> [1] "pass"
+report$source$status
+#> [1] "not_run"
+report$execution$status
+#> [1] "unsupported"
+```
+
+The report separates `metadata`, `source`, `lesson`, `render`, `execution`, and
+`accessibility`. Each check has a status and reason:
+
+| Status | Meaning |
+| --- | --- |
+| `pass` | The stated check completed successfully. |
+| `fail` | The check found a problem. |
+| `not_run` | The check was skipped or could not complete. |
+| `unsupported` | The prototype has no implementation for this check. |
+
+URL requests are enabled by default. Broken links can fail independently of
+rendering. Network failures, access restrictions, and rate limits are reported
+as `not_run` because they leave reachability uncertain.
+
+Rendering is opt-in and runs trusted author code in a temporary copy. Supply
+the project directory and a relative entry filename, such as
+`check_tutorial(metadata, render = TRUE, tutorial_dir = "my-tutorial",
+tutorial_file = "lesson.Rmd")`. The directory must contain the required assets
+and configuration. A repository URL alone is not enough.
+
+| Engine | Rendering requirements |
+| --- | --- |
+| `learnr` | R packages `callr`, `rmarkdown`, `learnr`; Pandoc |
+| `learnr2` | R packages `callr`, `quarto`, `learnr2`; Quarto CLI |
+| `quarto-live` | R packages `callr`, `quarto`; Quarto CLI and the project's Live extension |
+
+Missing rendering tools produce `not_run`. Install optional R packages from
+CRAN, except [learnr2](https://github.com/PPBDS/learnr2), which is available from
+GitHub. These dependencies are needed only for the selected renderer.
+
+See the [check reference](man/check_tutorial.Rd) for arguments and failure
+handling, and the [adapter reference](man/learnr_adapter.Rd) for supported
+document formats.
 
 ## Metadata
 
@@ -91,14 +141,14 @@ types, URL restrictions, and result details. The
 
 ## Prototype status
 
-This version validates metadata locally, including known failures in test
-records. It does not contact tutorial URLs, render tutorials, or run exercises.
-A passing result does not establish that a tutorial works or that its
-maintainer and license information is accurate.
+One real tutorial from each engine rendered successfully during development.
+The [adapter review](prototype/adapter-review.md) records the sources and tools.
+Rendering proves that a fresh HTML document was built. Interactive exercises
+and accessibility remain `unsupported`; a working lesson needs further checks.
+Metadata validation also cannot establish ownership or license accuracy.
 
-Engine adapters, `check_tutorial()`, real tutorial examples, registry generation
-with `build_registry()`, and automated CI checks are planned. Evidence that the
-shared interface works across engines still requires those steps.
+Curated example records, registry generation with `build_registry()`, CI, and
+measurements of author effort are planned for the next feature increment.
 
 ## Development
 
@@ -118,7 +168,11 @@ devtools::test()
 devtools::check(document = FALSE, error_on = "never")
 ```
 
-Tests use local files and do not require network access.
+Ordinary tests use local files and controlled HTTP and renderer responses.
+Set `TUTORIALVERSE_NETWORK_TESTS=true` to enable a live URL check, or
+`TUTORIALVERSE_RENDER_TESTS=true` to enable a real learnr render test. These
+integration tests are skipped by default. The render test needs the learnr
+dependencies listed above.
 
 ## License
 
