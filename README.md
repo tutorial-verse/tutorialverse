@@ -4,6 +4,16 @@ A minimal R package for describing and validating interactive R tutorials.
 This first prototype increment validates metadata for `learnr`, `learnr2`, and
 Quarto Live. It does not execute or render tutorials.
 
+## Creators and maintainers
+
+Shaurita D. Hutchins and Samuel Bharti are co-creators and co-maintainers.
+
+- Shaurita D. Hutchins: <sdhutchins@uab.edu> (designated R package maintainer)
+- Samuel Bharti: <samuelbharti.io@gmail.com>
+
+Copyright (c) 2026 Shaurita D. Hutchins and Samuel Bharti.
+Released under the [MIT license](LICENSE.md).
+
 ## Try the metadata validator
 
 From the repository root, with the development dependencies installed:

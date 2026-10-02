@@ -2,7 +2,10 @@ Package: tutorialverse
 Title: Describe and Validate Interactive R Tutorials
 Version: 0.0.0.9000
 Authors@R:
-    person("sdhutchins", , , "sdhutchins@uab.edu", role = c("aut", "cre"))
+    c(person("Shaurita D.", "Hutchins",
+             email = "sdhutchins@uab.edu", role = c("aut", "cre", "cph")),
+      person("Samuel", "Bharti",
+             email = "samuelbharti.io@gmail.com", role = c("aut", "cph")))
 Description: Reads and validates shared metadata for interactive R
     tutorials. Provides structured validation results for tutorials
     described across multiple engines without modifying or executing

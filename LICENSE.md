@@ -1,6 +1,6 @@
 # MIT License
 
-Copyright (c) 2026 sdhutchins
+Copyright (c) 2026 Shaurita D. Hutchins and Samuel Bharti
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
