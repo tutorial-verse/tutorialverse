@@ -1,21 +1,28 @@
 Package: tutorialverse
-Title: Describe and Validate Interactive R Tutorials
+Title: Describe and Check Interactive R Tutorials
 Version: 0.0.0.9000
 Authors@R:
     c(person("Shaurita D.", "Hutchins",
              email = "sdhutchins@uab.edu", role = c("aut", "cre", "cph")),
       person("Samuel", "Bharti",
              email = "samuelbharti.io@gmail.com", role = c("aut", "cph")))
-Description: Reads and validates shared metadata for interactive R
-    tutorials. Provides structured validation results for tutorials
-    described across multiple engines without modifying or executing
-    tutorial content.
+Description: Validates shared metadata and checks source and lesson URLs
+    for interactive R tutorials. Provides engine adapters for optional
+    rendering of local tutorial copies and structured reports that
+    distinguish completed checks from unsupported interactive testing.
 License: MIT + file LICENSE
 Encoding: UTF-8
 Roxygen: list(markdown = TRUE)
 Suggests:
-    testthat (>= 3.0.0)
+    callr,
+    learnr,
+    learnr2,
+    quarto,
+    rmarkdown,
+    testthat (>= 3.2.0)
 Config/testthat/edition: 3
 Imports:
+    curl (>= 5.0.0),
     yaml
+Remotes: PPBDS/learnr2
 Config/roxygen2/version: 8.1.0
