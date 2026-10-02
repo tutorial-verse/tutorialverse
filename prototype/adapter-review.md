@@ -1,60 +1,84 @@
-# Adapter evidence
+# Adapter review
 
-Local review on October 1, 2026. The prototype checks metadata, HTTP responses,
-and fresh HTML output separately. The sources below informed adapter behavior
-before implementation. They are inspected tutorials, not curated registry records.
+## Purpose
 
-## Sources and observed results
+Tutorialverse supports tutorials built with learnr, learnr2, and Quarto Live.
+Each system has an adapter, a small component that checks the tutorial's
+information and builds its HTML file.
 
-| Engine | Tutorial inspected and rendered | Result | What this establishes |
-| --- | --- | --- | --- |
-| learnr | [Hello, Tutorial!](https://github.com/rstudio/learnr/blob/v0.11.6/inst/tutorials/hello/hello.Rmd), installed with learnr 0.11.6 | `pass`, 48,622 HTML bytes | `learnr::tutorial` builds through R Markdown and Pandoc. |
-| learnr2 | [Hello, learnr2](https://github.com/PPBDS/learnr2/blob/d3f68395d5d9ce93c991f6a6d47d80d71ce48bc0/inst/tutorials/hello-learnr2/hello-learnr2.qmd) | `pass`, 81,006 HTML bytes | `live-html` builds with the package's bundled Live extension. |
-| Quarto Live | [Creating Exercises](https://github.com/r-wasm/quarto-live/blob/12fb30a5dd5e1bbe6d8ace96795eb1c114c80447/docs/exercises/exercises.qmd) | `pass`, 94,126 HTML bytes | The document builds within its existing Quarto project and Live extension. |
+## What we checked
 
-All renders used temporary copies. Checksums and file listings of the source
-tutorial directories matched before and after rendering. Output sizes describe
-these runs only; they are not regression targets or quality scores.
+On October 1, 2026, we tested one example tutorial from each system. All three
+produced a new HTML file containing output. We worked with temporary copies and
+verified that the original files were preserved by comparing file listings and
+checksums before and after each build.
 
-Environment: R 4.5.1 on macOS, learnr 0.11.6, rmarkdown 2.31, learnr2
+We checked website responses separately. A request to `https://example.org`
+returned HTTP 200, a successful response. Automated tests cover several response
+and connection conditions.
+
+## What the results establish
+
+The review establishes that the adapters can build these examples with the
+required software and project files available. Each adapter reads the format
+specified at the top of the tutorial and uses the corresponding build tools.
+learnr2 and Quarto Live share the same `live-html` format.
+
+The current checks cover tutorial information, website responses, and HTML
+builds. A successful website response records that the server answered at the
+time of the check. Confirming the page's content and source requires a separate
+review.
+
+Checking the learner's experience requires an interactive session where someone
+submits answers and examines feedback. Accessibility, teaching quality, and
+licensing also require their own reviews.
+
+## Next steps
+
+The next step is to add three curated public tutorials to the registry, produce
+registry output, and run the checks automatically through GitHub. That work will
+also record which information was inferred or supplied manually, which details
+need follow-up, and how much time authors spent preparing it. Measuring inference
+rates and author effort belongs to that next stage.
+
+## Reference details
+
+### Example tutorials
+
+These examples informed the adapter implementation. They serve as build examples;
+curating public registry records is the next stage.
+
+| System | Example | Build result |
+| --- | --- | --- |
+| learnr | [Hello, Tutorial!](https://github.com/rstudio/learnr/blob/v0.11.6/inst/tutorials/hello/hello.Rmd) | `pass` |
+| learnr2 | [Hello, learnr2](https://github.com/PPBDS/learnr2/blob/d3f68395d5d9ce93c991f6a6d47d80d71ce48bc0/inst/tutorials/hello-learnr2/hello-learnr2.qmd) | `pass` |
+| Quarto Live | [Creating Exercises](https://github.com/r-wasm/quarto-live/blob/12fb30a5dd5e1bbe6d8ace96795eb1c114c80447/docs/exercises/exercises.qmd) | `pass` |
+
+The learnr example came from the installed package and built through R Markdown
+and Pandoc. The learnr2 adapter copied its installed Live extension into the
+temporary tutorial directory. Quarto Live used the upstream repository as its
+project root, including its assets and extension, with
+`docs/exercises/exercises.qmd` as the entry file.
+
+### Adapter behavior
+
+- All three adapters support metadata and HTML build checks. A `not_run` result
+  means a check needs the required build tools or a working connection before it
+  can establish a result.
+- Format detection reads the tutorial's own header. Recognizing project-level
+  formats and testing `live-revealjs` are follow-up work. Identifying learnr2 or
+  Quarto Live specifically requires information beyond their shared format.
+- learnr builds can catch errors in R code executed during the build. Its optional
+  integration test distinguishes build errors from interactive exercise errors.
+  Exercise testing requires Shiny for learnr and WebR or Pyodide for the Live
+  formats.
+- Website tests use controlled responses for success, broken links, redirects,
+  restricted access, timeouts, offline mode, and a second request when HEAD is
+  unsuitable. DNS and transport errors receive `not_run` because the link's
+  condition needs further checking.
+
+### Software versions
+
+The review ran on macOS with R 4.5.1, learnr 0.11.6, rmarkdown 2.31, learnr2
 0.1.0.9001 at the linked revision, quarto R package 1.5.1, Quarto CLI 1.10.18,
-Pandoc 3.11 for the learnr render, and callr 3.8.0.
-
-The learnr sources were supplied with the installed package. For learnr2, the
-adapter copied its installed extension into the temporary tutorial directory.
-For Quarto Live, the supplied root was the upstream repository checkout and the
-entry file was `docs/exercises/exercises.qmd`. Its project assets and extension
-were available in that checkout.
-
-The HTTP transport separately returned HTTP 200 for `https://example.org`.
-Ordinary regression tests use controlled responses for success, broken links,
-redirect outcomes, restricted access, timeouts, offline mode, and HEAD fallback.
-The tutorial URLs above were not used as evidence of interactive correctness.
-
-## Capability limits
-
-All three adapters declare metadata and render checks supported. Interactive
-execution and accessibility checks are unsupported. Capability flags describe
-implemented checks; missing local rendering tools produce `not_run`.
-
-- learnr rendering can catch build-time R failures. It does not start a Shiny
-  session, submit exercise answers, or evaluate feedback. The optional integration
-  test contrasts a failing build chunk with a failing interactive exercise.
-- learnr2 and Quarto Live both use `live-html`. Their format checks overlap and
-  cannot independently identify the authoring package. Their browser exercises
-  require WebR or Pyodide testing beyond HTML generation.
-- Only formats declared in the document header are recognized. Project-inherited
-  formats are outside this prototype's scope. `live-revealjs` uses the same render
-  path but was not exercised by the three tutorials above.
-- A successful HTTP response establishes a response at that time, not tutorial
-  content, source identity, or runtime behavior. DNS and transport failures leave
-  the link's condition uncertain and produce `not_run`.
-- A successful render requires new, nonempty HTML. It does not measure teaching
-  quality, exercise correctness, accessibility, or license validity.
-
-## Next evidence to collect
-
-The next increment should add three curated public records, registry output,
-and CI. Record which metadata fields were inferred, supplied manually, or remain
-unknown, together with time spent by the author. No inference rates or author
-effort measurements have been collected in this increment.
+and callr 3.8.0. The learnr build used Pandoc 3.11.
