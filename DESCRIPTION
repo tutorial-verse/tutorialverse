@@ -1,0 +1,18 @@
+Package: tutorialverse
+Title: Describe and Validate Interactive R Tutorials
+Version: 0.0.0.9000
+Authors@R:
+    person("sdhutchins", , , "sdhutchins@uab.edu", role = c("aut", "cre"))
+Description: Reads and validates shared metadata for interactive R
+    tutorials. Provides structured validation results for tutorials
+    described across multiple engines without modifying or executing
+    tutorial content.
+License: MIT + file LICENSE
+Encoding: UTF-8
+Roxygen: list(markdown = TRUE)
+Suggests:
+    testthat (>= 3.0.0)
+Config/testthat/edition: 3
+Imports:
+    yaml
+Config/roxygen2/version: 8.1.0

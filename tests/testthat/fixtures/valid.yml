@@ -1,0 +1,11 @@
+# Synthetic metadata for deterministic tests; not a real tutorial.
+id: intro-example
+title: Introduction to R
+engine: learnr
+source: https://example.org/source
+lesson: https://example.org/lesson
+maintainer: Example maintainer
+license: MIT
+topics:
+  - R
+  - data frames

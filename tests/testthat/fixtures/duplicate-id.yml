@@ -1,0 +1,9 @@
+id: intro-example
+title: Another tutorial with the same ID
+engine: learnr2
+source: https://example.org/another-source
+lesson: https://example.org/another-lesson
+maintainer: Example maintainer
+license: MIT
+topics:
+  - R

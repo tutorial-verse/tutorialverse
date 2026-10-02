@@ -1,0 +1,9 @@
+id: url-example
+title: Invalid URL example
+engine: quarto-live
+source: https://
+lesson: not-a-url
+maintainer: Example maintainer
+license: MIT
+topics:
+  - R
